@@ -53,7 +53,7 @@ model2 = cross-encoder/ms-marco-TinyBERT-L-2-v2
 
 3. ms-marco-TinyBERT-L-2-v2
 - 2024年更新的TinyBERT模型
-- todo：正在训练
+- 效果不好
 
 4. ModernBert-base
 - todo：正在训练
