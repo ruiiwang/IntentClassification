@@ -1,31 +1,19 @@
 import torch
-from transformers import BertTokenizer, AutoModelForSequenceClassification, AutoTokenizer
+from transformers import BertTokenizer, AutoModelForSequenceClassification, AutoTokenizer, AutoModelForMaskedLM
 from sklearn.preprocessing import LabelEncoder
 import time
 import pickle
-from tinybert1 import ModelConfig, Config
-
-
-class Config:
-    model_name = "huawei-noah/TinyBERT_General_4L_312D"
-    max_length = 128
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    confidence_threshold = 0.6  # 置信度阈值
-    model_path = "model1/best_model.pt"  # 模型文件路径
-    label_encoder_path = "model1/label_encoder.pkl"  # 标签编码器文件路径
+from config import BaseConfig, ModelConfig
 
 
 def predict_text(text, model, tokenizer, label_encoder, config):
     """
-    预测文本意图的函数
-
-    参数:
+    预测文本意图
     text (str): 输入文本
     model: 加载的模型
     tokenizer: 分词器
     label_encoder: 标签编码器
-    config: 配置对象
-
+    config: 配置
     返回:
     list: 预测结果列表
     float: 预测耗时（毫秒）
@@ -101,10 +89,7 @@ def predict_text(text, model, tokenizer, label_encoder, config):
 def load_model_and_tokenizer(config):
     """
     加载模型和分词器
-
-    参数:
-    config: 配置对象
-
+    config: 配置
     返回:
     tuple: (model, tokenizer, label_encoder)
     """
@@ -139,13 +124,12 @@ def load_model_and_tokenizer(config):
 
 
 def main():
-    """主函数"""
-    config = Config()
+    config = BaseConfig()
 
     try:
         print("正在加载模型...")
         model, tokenizer, label_encoder = load_model_and_tokenizer(config)
-        print("模型加载完成！")
+        print("模型加载完成")
 
         # 交互式预测
         print("\n开始交互式预测 (输入 'quit' 退出):")
@@ -158,7 +142,7 @@ def main():
                     break
                 # 检查输入是否为空
                 if not user_input:
-                    print("请输入有效文本！")
+                    print("请输入有效文本")
                     continue
                 # 进行预测
                 predictions, pred_time = predict_text(

@@ -5,21 +5,28 @@ import os
 class ModelConfig:
     # 定义可用的模型配置
     MODELS = {
-        'model1': {
+        'model4': {
             'name': 'huawei-noah/TinyBERT_General_4L_312D',
             'tokenizer': 'BertTokenizer',
-            'dir': 'model1'
+            'dir': 'model4'
         },
         'model2': {
-            'name': 'cross-encoder/ms-marco-TinyBERT-L-2-v2',
+            'name': 'microsoft/deberta-v3-small',
             'tokenizer': 'AutoTokenizer',
+            'model_type': 'AutoModel',
             'dir': 'model2'
-        }
+        },
+        'model3': {
+            'name': 'MilyaShams/SmolLM2-135M-Instruct-Reward',
+            'tokenizer': 'AutoTokenizer',
+            'model_type': 'AutoModelForSequenceClassification',
+            'dir': 'model3',
+        },
     }
 
 
 class BaseConfig:
-    selected_model = 'model1'
+    selected_model = 'model4'
     # 根据选择获取模型配置
     model_config = ModelConfig.MODELS[selected_model]
     model_name = model_config['name']

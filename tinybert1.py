@@ -12,45 +12,10 @@ from sklearn.metrics import classification_report, confusion_matrix, precision_r
 from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from transformers import AutoTokenizer, BertTokenizer, AutoModelForSequenceClassification
+from transformers import AutoTokenizer, BertTokenizer, AutoModelForSequenceClassification, AutoModelForMaskedLM, \
+    AutoModel
 
-# from config import ModelConfig, TrainConfig, BaseConfig
-
-
-class ModelConfig:
-    # 定义可用的模型配置
-    MODELS = {
-        'model1': {
-            'name': 'huawei-noah/TinyBERT_General_4L_312D',
-            'tokenizer': 'BertTokenizer',
-            'dir': 'model1'
-        },
-        'model2': {
-            'name': 'cross-encoder/ms-marco-TinyBERT-L-2-v2',
-            'tokenizer': 'AutoTokenizer',
-            'dir': 'model2'
-        }
-    }
-
-class Config:
-    selected_model = 'model1'
-
-    model_config = ModelConfig.MODELS[selected_model]
-    model_name = model_config['name']
-    model_dir = f"model/{model_config['dir']}"
-    max_length = 64
-    batch_size = 32
-    epochs = 50
-    learning_rate = 2e-5
-    warmup_steps = 0
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    train_ratio = 0.7
-    valid_ratio = 0.15
-    test_ratio = 0.15
-    confidence_threshold = 0.6  # 置信度阈值
-    metrics_dir = f"{model_dir}/metrics"  # 指标保存目录
-    model_path = f"{model_dir}/best_model.pt"
-    label_encoder_path = f"{model_dir}/label_encoder.pkl"
+from config import ModelConfig, TrainConfig, BaseConfig
 
 
 class TextDataset(torch.utils.data.Dataset):
@@ -412,8 +377,53 @@ def evaluate_model(model, test_dataloader, config, metrics_collector):
     return all_labels, all_predictions, all_probabilities
 
 
+def create_model_for_classification(config, num_labels):
+    if 'model_type' in config.model_config:
+        if config.model_config['model_type'] == 'AutoModelForMaskedLM':
+            # MaskedLM 模型处理逻辑
+            base_model = AutoModelForMaskedLM.from_pretrained(config.model_name)
+            hidden_size = base_model.config.hidden_size
+            classifier = torch.nn.Linear(hidden_size, num_labels)
+            base_model.classifier = classifier
+            return base_model
+        elif config.model_config['model_type'] == 'AutoModel':
+            # AutoModel处理逻辑（用于DeBERTa等模型）
+            base_model = AutoModel.from_pretrained(config.model_name)
+
+            # 创建分类器结构
+            class ClassificationModel(torch.nn.Module):
+                def __init__(self, base_model, num_labels):
+                    super().__init__()
+                    self.base_model = base_model
+                    self.dropout = torch.nn.Dropout(0.1)
+                    self.classifier = torch.nn.Linear(base_model.config.hidden_size, num_labels)
+
+                def forward(self, **inputs):
+                    # 移除 labels 以防止base_model报错
+                    labels = inputs.pop('labels', None)
+                    outputs = self.base_model(**inputs)
+                    sequence_output = outputs[0]  # (batch_size, sequence_length, hidden_size)
+                    # 使用 [CLS] token的输出进行分类
+                    pooled_output = sequence_output[:, 0]  # (batch_size, hidden_size)
+                    pooled_output = self.dropout(pooled_output)
+                    logits = self.classifier(pooled_output)
+
+                    if labels is not None:
+                        loss_fct = torch.nn.CrossEntropyLoss()
+                        loss = loss_fct(logits.view(-1, num_labels), labels.view(-1))
+                        return type('ModelOutput', (), {'loss': loss, 'logits': logits})()
+                    return type('ModelOutput', (), {'logits': logits})()
+
+            return ClassificationModel(base_model, num_labels)
+    else:
+        return AutoModelForSequenceClassification.from_pretrained(
+            config.model_name,
+            num_labels=num_labels
+        )
+
+
 def main():
-    config = Config()
+    config = TrainConfig()
     metrics_collector = ModelMetrics(config)
     os.makedirs(config.model_dir, exist_ok=True)
 
@@ -438,10 +448,7 @@ def main():
     elif config.model_config['tokenizer'] == 'AutoTokenizer':
         tokenizer = AutoTokenizer.from_pretrained(config.model_name)
 
-    model = AutoModelForSequenceClassification.from_pretrained(
-        config.model_name,
-        num_labels=len(label_encoder.classes_)
-    )
+    model = create_model_for_classification(config, len(label_encoder.classes_))
     model.to(config.device)
 
     # 创建数据加载器
