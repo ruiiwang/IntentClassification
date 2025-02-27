@@ -418,7 +418,8 @@ def create_model_for_classification(config, num_labels):
     else:
         return AutoModelForSequenceClassification.from_pretrained(
             config.model_name,
-            num_labels=num_labels
+            num_labels=num_labels,
+            ignore_mismatched_sizes=True
         )
 
 

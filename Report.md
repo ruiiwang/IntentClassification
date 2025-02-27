@@ -19,20 +19,20 @@
 
 #### 2.2 每类精度
 
-| 类别                        | 精确率 | 召回率 |
-| --------------------------- | ------ | ------ |
-| "Ask_a_question_need_photo" | 96.33% | 99.82% |
-| "Battery_check"             | 97.21% | 99.59% |
-| "Next_music"                       | 96.79% | 97.69% |
-| "Pause_music"            | 98.32% | 99.32% |
-| "Phone_call_[contact_name]" | 99.25% | 98.51% |
-| "Play_music" | 92.79% | 95.93% |
-| "Previous_music" | 97.84% | 99.56% |
-| "Start_recording" | 91.00% | 98.38% |
-| "Stop_recording" | 100.00% | 98.03% |
-| "Take_a_picture" | 97.91% | 98.73% |
-| "Volume_down" | 95.72% | 96.76% |
-| "Volume_up" | 99.43% | 97.22% |
+| 类别                          | 精确率     | 召回率    |
+|-----------------------------|---------|--------|
+| "Ask_a_question_need_photo" | 96.33%  | 99.82% |
+| "Battery_check"             | 97.21%  | 99.59% |
+| "Next_music"                | 96.79%  | 97.69% |
+| "Pause_music"               | 98.32%  | 99.32% |
+| "Phone_call_[contact_name]" | 99.25%  | 98.51% |
+| "Play_music"                | 92.79%  | 95.93% |
+| "Previous_music"            | 97.84%  | 99.56% |
+| "Start_recording"           | 91.00%  | 98.38% |
+| "Stop_recording"            | 100.00% | 98.03% |
+| "Take_a_picture"            | 97.91%  | 98.73% |
+| "Volume_down"               | 95.72%  | 96.76% |
+| "Volume_up"                 | 99.43%  | 97.22% |
 
 #### 2.3 运行速度
 
@@ -47,9 +47,3 @@
 - **批量大小**：batch_size=32
 - **训练轮次**：epochs=30
 - **分类阈值**：confidence_threshold=0.6
-
-### 4. 结论
-
-- **模型优势**：
-- **存在问题**：
-- **改进方向**：

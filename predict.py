@@ -107,7 +107,8 @@ def load_model_and_tokenizer(config):
         # 初始化模型
         model = AutoModelForSequenceClassification.from_pretrained(
             config.model_name,
-            num_labels=len(label_encoder.classes_)
+            num_labels=len(label_encoder.classes_),
+            ignore_mismatched_sizes=True
         )
 
         # 加载训练好的模型权重
