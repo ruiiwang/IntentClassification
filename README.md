@@ -3,6 +3,14 @@
 ## 项目简介
 本项目是一个基于LLM的文本意图分类系统，支持增量学习和负样本训练。
 
+## 项目结构
+- config.py: 训练配置
+- fasttext.py: 使用fasttext方法训练代码
+- predict.py: 手动预测结果
+- train.py: 训练不同模型的代码
+- tinybert.py: 第一版训练tinybert的代码
+- 模型输出：/model/model{i}/best_model.pt, label_encoder.pkl
+
 ## 项目步骤
 1. 建立数据集
   - GPT-4o, Claude 3.5 Sonnet 等大模型用来生成数据集
