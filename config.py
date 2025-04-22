@@ -1,3 +1,4 @@
+from pyexpat import model
 import torch
 import os
 
@@ -9,23 +10,34 @@ class ModelConfig:
             'name': 'huawei-noah/TinyBERT_General_4L_312D',
             'tokenizer': 'BertTokenizer',
             'dir': 'model1'
-        },
+        },  # 原始版本
         'model2': {
             'name': 'microsoft/deberta-v3-small',
             'tokenizer': 'AutoTokenizer',
             'model_type': 'AutoModel',
             'dir': 'model2'
-        },
+        },  # 没用
         'model3': {
             'name': 'MilyaShams/SmolLM2-135M-Instruct-Reward',
             'tokenizer': 'AutoTokenizer',
             'dir': 'model3',
-        },
+        },  # 没用
+       'model4': {
+            'name': 'google-bert/bert-base-chinese',
+            'tokenizer': 'AutoTokenizer',
+            'dir':'model4',
+        },  # bert中文版本
+        'model5': {
+            'name': 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2',
+            'tokenizer': 'AutoTokenizer',
+            'model_type': 'AutoModel',
+            'dir':'model5',
+        },  # 多语言版本
     }
 
 
 class BaseConfig:
-    selected_model = 'model1'
+    selected_model = 'model5'
     # 根据选择获取模型配置
     model_config = ModelConfig.MODELS[selected_model]
     model_name = model_config['name']

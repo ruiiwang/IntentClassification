@@ -123,9 +123,22 @@ def load_model_and_tokenizer(config):
     except Exception as e:
         raise Exception(f"加载模型时发生错误: {str(e)}") from e
 
+class PredictConfig:
+    selected_model = 'model1'
+    # 根据选择获取模型配置
+    model_config = ModelConfig.MODELS[selected_model]
+    model_name = model_config['name']
+    model_dir = f"model/model1-0421"
+    # 模型相关路径
+    model_path = f"{model_dir}/best_model.pt"
+    label_encoder_path = f"{model_dir}/label_encoder.pkl"
+    # 基础配置
+    max_length = 64
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    confidence_threshold = 0.6
 
 def main():
-    config = BaseConfig()
+    config = PredictConfig()
 
     try:
         print("正在加载模型...")
